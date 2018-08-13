@@ -56,7 +56,7 @@ public class ZKManager {
 	private static void initConfig() {
 		if (zkConfig == null) {
 			zkConfig = new ZKConfig();
-			ResourceBundle rb = ResourceBundle.getBundle("zk");
+			ResourceBundle rb = ResourceBundle.getBundle("rhine_zk");
 			zkConfig.setConnectString(rb.getString("connectString"));
 			zkConfig.setPath(rb.getString("path"));
 			zkConfig.setSessionTimeout(Integer.parseInt(rb.getString("sessionTimeout")));
@@ -111,12 +111,6 @@ public class ZKManager {
 			try {
 				zookeeper = new ZooKeeper(zkConfig.getConnectString(), zkConfig.getSessionTimeout(), watcher);
 				String authString = zkConfig.getUserName() + ":" + zkConfig.getPassword();
-				try {
-					Thread.sleep(111111);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				//采用digest这种schema
 				zookeeper.addAuthInfo("digest", authString.getBytes());
 				//安全策略(用户名和密码的读写&任何人都可读的权限)
