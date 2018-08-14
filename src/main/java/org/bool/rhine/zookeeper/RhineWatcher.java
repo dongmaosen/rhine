@@ -27,6 +27,7 @@ public class RhineWatcher implements Watcher {
 		} else if (event.getState() == KeeperState.AuthFailed) {
 			//连接认证失败，重新连接无意义
 		}
+		//TODO
 		if (event.getType() == EventType.NodeChildrenChanged) {
 			
 		}

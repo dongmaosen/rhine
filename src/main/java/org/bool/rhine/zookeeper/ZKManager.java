@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooKeeper.States;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
@@ -117,10 +118,32 @@ public class ZKManager {
 				acl.add(new ACL(ZooDefs.Perms.ALL, new Id("digest", DigestAuthenticationProvider.generateDigest(authString))));
 				acl.add(new ACL(ZooDefs.Perms.READ, Ids.ANYONE_ID_UNSAFE));
 			} catch (IOException e) {
-				//TODO
+				//
 			} catch (NoSuchAlgorithmException e) {
-				//TODO
+				//
 			}
 		}
+	}
+	
+	public static List<ACL> getAcl() {
+		return acl;
+	}
+	/**
+	 * check zookeeper state (connected)
+	 * @return
+	 */
+	public static boolean checkState() {
+		return zookeeper == null ? false : zookeeper.getState() == States.CONNECTED;
+	}
+	/**
+	 * 对外提供zk对象
+	 * @return
+	 * @throws Exception
+	 */
+	public static ZooKeeper getZooKeeper() {
+		if(!checkState()){
+			reConnect();
+		}
+		return zookeeper;
 	}
 }
