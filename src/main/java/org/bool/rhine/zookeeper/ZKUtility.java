@@ -1,7 +1,6 @@
 package org.bool.rhine.zookeeper;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Stat;
 
 /**
  * ZK操作工具类
@@ -83,6 +83,28 @@ public class ZKUtility {
 			for (int i = paths.size() - 1; i >= 0; i--) {
 				ZKManager.getZooKeeper().delete(path, -1);
 			}
+		}
+	}
+	
+	/**
+	 *  将参数目录下所有的目录和值，存储到buffer中
+	 * @param path
+	 * @param buffer
+	 * @throws Exception 
+	 * @throws KeeperException 
+	 */
+	public static void printTree(String path, StringBuffer buffer) throws KeeperException, Exception {
+		List<String> paths = getPathTree(path);
+		Stat stat = new Stat();
+		for (String p : paths) {
+			byte[] data = ZKManager.getZooKeeper().getData(p, false, stat);
+			if (data == null) {
+				buffer.append(p).append("\n");
+			} else {
+				buffer.append(p).append("[v=").append(stat.getVersion())
+					  .append(",data=").append(new String(data)).append("]").append("\n");
+			}
+			
 		}
 	}
 }

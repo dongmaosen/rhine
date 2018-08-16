@@ -18,10 +18,16 @@ public class ZookeeperTest {
 	}
 	
 	@Test
-	public void printTree() throws Exception {
+	public void getTree() throws Exception {
 		List<String> paths = ZKUtility.getPathTree("/");
 		for (int i = 0; i < paths.size(); i++) {
-			System.out.println(paths.get(i));
+//			System.out.println(paths.get(i));
 		}
+	}
+	@Test
+	public void printTree() throws KeeperException, Exception {
+		StringBuffer buffer = new StringBuffer();
+		ZKUtility.printTree("/", buffer);
+		System.out.println(buffer.toString());
 	}
 }
