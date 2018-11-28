@@ -57,7 +57,7 @@ public class ZKManager {
 	private static void initConfig() {
 		if (zkConfig == null) {
 			zkConfig = new ZKConfig();
-			ResourceBundle rb = ResourceBundle.getBundle("rhine_zk");
+			ResourceBundle rb = ResourceBundle.getBundle("rhine");
 			zkConfig.setConnectString(rb.getString("connectString"));
 			zkConfig.setPath(rb.getString("path"));
 			zkConfig.setSessionTimeout(Integer.parseInt(rb.getString("sessionTimeout")));
