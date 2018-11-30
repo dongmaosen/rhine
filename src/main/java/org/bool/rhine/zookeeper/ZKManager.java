@@ -59,7 +59,7 @@ public class ZKManager {
 			zkConfig = new ZKConfig();
 			ResourceBundle rb = ResourceBundle.getBundle("rhine");
 			zkConfig.setConnectString(rb.getString("connectString"));
-			zkConfig.setPath(rb.getString("path"));
+			zkConfig.setPath(rb.getString("prefix"));
 			zkConfig.setSessionTimeout(Integer.parseInt(rb.getString("sessionTimeout")));
 			zkConfig.setUserName(rb.getString("userName"));
 			zkConfig.setPassword(rb.getString("password"));
@@ -118,9 +118,9 @@ public class ZKManager {
 				acl.add(new ACL(ZooDefs.Perms.ALL, new Id("digest", DigestAuthenticationProvider.generateDigest(authString))));
 				acl.add(new ACL(ZooDefs.Perms.READ, Ids.ANYONE_ID_UNSAFE));
 			} catch (IOException e) {
-				//
+				e.printStackTrace();
 			} catch (NoSuchAlgorithmException e) {
-				//
+				e.printStackTrace();
 			}
 		}
 	}

@@ -3,35 +3,44 @@ package org.bool.rhine;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.zookeeper.KeeperException;
+
+
 /**
  * 
- *
  * Author: 不二   
  *
  * Copyright @ 2018
  * 
  */
 public class RhineManager {
-	
+	/**
+	 * 单例
+	 */
 	private RhineManager() {}
-	
+	/**
+	 * 实例
+	 */
 	private static RhineManager rhineInstance = new RhineManager();
-	
+	/**
+	 * 获得实例
+	 * @return
+	 */
 	public static RhineManager getInstance() {
 		return rhineInstance;
 	}
 	/**
 	 * lock for initialization
 	 */
-	private Lock lock = new ReentrantLock();
+	private static Lock lock = new ReentrantLock();
 	/**
 	 * 客户端初始化线程
 	 */
-	RhineInitThread rhineInitThread;
+	private static RhineInitThread rhineInitThread;
 	/**
 	 * rhine初始化操作：客户端与ZK集群交互的开始，单独的线程
 	 */
-	public void init() {
+	public static void init() {
 		if (rhineInitThread != null) {
 			rhineInitThread.stopThread();
 		}
@@ -39,7 +48,7 @@ public class RhineManager {
 		lock.lock();
 		try {
 			if (rhineInitThread == null || rhineInitThread.isStoped()) {				
-				rhineInitThread = new RhineInitThread(this);
+				rhineInitThread = new RhineInitThread(getInstance());
 				rhineInitThread.setName("rhineInitThread-" + rhineInitThread.getId());
 				rhineInitThread.start();
 			}
@@ -48,44 +57,17 @@ public class RhineManager {
 		}
 	}
 	/**
-	 * 初始化基本路径数据
+	 * 创建当前活动的节点信息（临时节点）
+	 * @throws Exception 
+	 * @throws KeeperException 
 	 */
-	public void initBaseData() {
+	public void initTaskNodeManager() throws KeeperException, Exception {
+		RhineNodeManager.registNode();
+	}
+	/**
+	 * 加载策略和任务判断执行
+	 */
+	public void loadStrategyAndTask() {
 		// TODO Auto-generated method stub
-		
-	}
-}
-
-/**
- * 初始化线程
- */
-class RhineInitThread extends Thread {
-	
-	private boolean stop = false;
-	
-	/**
-	 * 外部引用，用来通过外部manager的设置，控制线程内部逻辑
-	 */
-	RhineManager rm;
-	
-	public RhineInitThread(RhineManager rm) {
-		this.rm = rm;
-	}
-	
-	@Override
-	public void run() {
-		//初始化当前应用配置在ZK的目录
-		rm.initBaseData();
-	}
-	
-	public void stopThread() {
-		stop = true;
-	}
-	/**
-	 * 是否停止运行
-	 * @return false-未停止 true-停止
-	 */
-	public boolean isStoped() {
-		return stop;
 	}
 }

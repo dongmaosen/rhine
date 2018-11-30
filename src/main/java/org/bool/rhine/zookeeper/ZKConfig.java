@@ -1,6 +1,7 @@
 package org.bool.rhine.zookeeper;
 /**
  * zookeeper配置参数
+ * 
  * @author 不二
  *
  */
