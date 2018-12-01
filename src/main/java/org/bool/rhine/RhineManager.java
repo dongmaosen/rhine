@@ -26,7 +26,7 @@ public class RhineManager {
 	 * 获得实例
 	 * @return
 	 */
-	public static RhineManager getInstance() {
+	private static RhineManager getInstance() {
 		return rhineInstance;
 	}
 	/**
@@ -41,13 +41,11 @@ public class RhineManager {
 	 * rhine初始化操作：客户端与ZK集群交互的开始，单独的线程
 	 */
 	public static void init() {
-		if (rhineInitThread != null) {
-			rhineInitThread.stopThread();
-		}
+
 		//锁定防止多线程同时初始化
 		lock.lock();
 		try {
-			if (rhineInitThread == null || rhineInitThread.isStoped()) {				
+			if (rhineInitThread == null) {				
 				rhineInitThread = new RhineInitThread(getInstance());
 				rhineInitThread.setName("rhineInitThread-" + rhineInitThread.getId());
 				rhineInitThread.start();

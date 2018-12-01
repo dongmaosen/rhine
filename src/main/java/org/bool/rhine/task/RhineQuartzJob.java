@@ -10,6 +10,33 @@ import org.quartz.Job;
  * Copyright @ 2018
  * 
  */
-public interface RhineQuartzJob extends Job{
+public abstract class RhineQuartzJob implements Job{
+	/**
+	 * 任务名称
+	 */
+	private String name;
+	/**
+	 * 任务功能描述
+	 */
+	private String desc;
 	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
+
+	public String getClassName() {
+		return this.getClass().getName();
+	}
 }

@@ -1,5 +1,6 @@
 package org.bool.rhine.zookeeper;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -108,6 +109,16 @@ public class ZKUtility {
 			
 		}
 	}
-
-	
+	/**
+	 * 创建带数据的节点
+	 * @param path
+	 * @param data
+	 * @param mode
+	 * @throws Exception
+	 */
+	public static void create(String path, byte[] data, CreateMode mode) throws Exception {
+		if (ZKManager.getZooKeeper().exists(path, false) == null) {			
+			ZKManager.getZooKeeper().create(path, data, ZKManager.getAcl(), mode);
+		}
+	}
 }

@@ -14,9 +14,6 @@ import org.bool.rhine.zookeeper.ZKUtility;
  * 
  */
 public class RhineInitThread extends Thread{
-
-	
-	private boolean stop = false;
 	
 	/**
 	 * 外部引用，用来通过外部manager的设置，控制线程内部逻辑
@@ -30,6 +27,8 @@ public class RhineInitThread extends Thread{
 	@Override
 	public void run() {
 		try {
+			//0.连接ZK
+			ZKManager.connect();
 			//1.初始化当前应的ZK的目录（永久节点）
 			//首先检查zk是否连接，未连接每隔2秒连接一次
 			while (!ZKManager.checkState()) {
@@ -52,17 +51,6 @@ public class RhineInitThread extends Thread{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public void stopThread() {
-		stop = true;
-	}
-	/**
-	 * 是否停止运行
-	 * @return false-未停止 true-停止
-	 */
-	public boolean isStoped() {
-		return stop;
 	}
 
 }

@@ -24,6 +24,11 @@ public class RhineStrategy {
 	 * 创建时间
 	 */
 	private String createTime;
+	/**
+	 * 描述
+	 */
+	private String desc;
+	
 	public String getCrontab() {
 		return crontab;
 	}
@@ -47,6 +52,12 @@ public class RhineStrategy {
 	}
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
+	}
+	public String getDesc() {
+		return desc;
+	}
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 	
 }

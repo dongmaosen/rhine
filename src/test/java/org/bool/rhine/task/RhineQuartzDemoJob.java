@@ -13,7 +13,7 @@ import org.quartz.JobExecutionException;
  * Copyright @ 2018
  * 
  */
-public class RhineQuartzDemoJob implements RhineQuartzJob {
+public class RhineQuartzDemoJob extends RhineQuartzJob {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		System.out.println("RhineQuartzDemoJob : " + new Date().getTime() );
