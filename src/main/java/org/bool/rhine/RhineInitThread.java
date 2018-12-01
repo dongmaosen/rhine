@@ -18,9 +18,9 @@ public class RhineInitThread extends Thread{
 	/**
 	 * 外部引用，用来通过外部manager的设置，控制线程内部逻辑
 	 */
-	RhineManager rm;
+	RhineStarter rm;
 	
-	public RhineInitThread(RhineManager rm) {
+	public RhineInitThread(RhineStarter rm) {
 		this.rm = rm;
 	}
 	

@@ -14,7 +14,7 @@ public class RhineManagerTest {
 	
 	@Test
 	public void rhineInitTest() throws InterruptedException {
-		RhineManager.init();
+		RhineStarter.init();
 		Thread.sleep(60 * 60 * 1000);
 	}
 }

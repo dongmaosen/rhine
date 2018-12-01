@@ -13,20 +13,20 @@ import org.apache.zookeeper.KeeperException;
  * Copyright @ 2018
  * 
  */
-public class RhineManager {
+public class RhineStarter {
 	/**
 	 * 单例
 	 */
-	private RhineManager() {}
+	private RhineStarter() {}
 	/**
 	 * 实例
 	 */
-	private static RhineManager rhineInstance = new RhineManager();
+	private static RhineStarter rhineInstance = new RhineStarter();
 	/**
 	 * 获得实例
 	 * @return
 	 */
-	private static RhineManager getInstance() {
+	private static RhineStarter getInstance() {
 		return rhineInstance;
 	}
 	/**
@@ -67,5 +67,6 @@ public class RhineManager {
 	 */
 	public void loadStrategyAndTask() {
 		// TODO Auto-generated method stub
+		
 	}
 }
