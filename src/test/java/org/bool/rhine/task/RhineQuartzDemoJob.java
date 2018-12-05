@@ -16,7 +16,12 @@ import org.quartz.JobExecutionException;
 public class RhineQuartzDemoJob extends RhineQuartzJob {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		System.out.println("RhineQuartzDemoJob : " + new Date().getTime() );
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("RhineQuartzDemoJob : " + new Date().getTime() + "(" + Thread.currentThread().getName() + ")");
 	}
 
 }

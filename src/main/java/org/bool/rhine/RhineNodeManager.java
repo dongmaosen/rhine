@@ -35,9 +35,9 @@ public class RhineNodeManager {
 	 */
 	public static void registNode() throws KeeperException, Exception {
 		if (nodeName == null) {			
-			nodeName = InetAddress.getLocalHost().getHostAddress() + "#" + UUID.randomUUID();
+			nodeName = InetAddress.getLocalHost().getHostAddress() + "#" + UUID.randomUUID().toString().replaceAll("-", "") + "#";
 		}
-		ZKUtility.createPath(ZKManager.getZKConfig().getPath() + "/node/" + nodeName, CreateMode.EPHEMERAL_SEQUENTIAL, ZKManager.getAcl());
+		ZKUtility.createPath(ZKManager.getZKConfig().getPath() + "/node/" + nodeName, CreateMode.EPHEMERAL_SEQUENTIAL, ZKManager.getAcl(), false);
 	}
 	
 	

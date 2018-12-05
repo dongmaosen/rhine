@@ -3,9 +3,6 @@ package org.bool.rhine;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.zookeeper.KeeperException;
-
-
 /**
  * 
  * Author: 不二   
@@ -14,21 +11,6 @@ import org.apache.zookeeper.KeeperException;
  * 
  */
 public class RhineStarter {
-	/**
-	 * 单例
-	 */
-	private RhineStarter() {}
-	/**
-	 * 实例
-	 */
-	private static RhineStarter rhineInstance = new RhineStarter();
-	/**
-	 * 获得实例
-	 * @return
-	 */
-	private static RhineStarter getInstance() {
-		return rhineInstance;
-	}
 	/**
 	 * lock for initialization
 	 */
@@ -46,27 +28,12 @@ public class RhineStarter {
 		lock.lock();
 		try {
 			if (rhineInitThread == null) {				
-				rhineInitThread = new RhineInitThread(getInstance());
+				rhineInitThread = new RhineInitThread();
 				rhineInitThread.setName("rhineInitThread-" + rhineInitThread.getId());
 				rhineInitThread.start();
 			}
 		} finally {
 			lock.unlock();
 		}
-	}
-	/**
-	 * 创建当前活动的节点信息（临时节点）
-	 * @throws Exception 
-	 * @throws KeeperException 
-	 */
-	public void initTaskNodeManager() throws KeeperException, Exception {
-		RhineNodeManager.registNode();
-	}
-	/**
-	 * 加载策略和任务判断执行
-	 */
-	public void loadStrategyAndTask() {
-		// TODO Auto-generated method stub
-		
 	}
 }
