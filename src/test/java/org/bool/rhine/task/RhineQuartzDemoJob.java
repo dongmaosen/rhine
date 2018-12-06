@@ -2,6 +2,7 @@ package org.bool.rhine.task;
 
 import java.util.Date;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -16,12 +17,8 @@ import org.quartz.JobExecutionException;
 public class RhineQuartzDemoJob extends RhineQuartzJob {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println("RhineQuartzDemoJob : " + new Date().getTime() + "(" + Thread.currentThread().getName() + ")");
+		String ft = DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss");
+		System.out.println("RhineQuartzDemoJob : " + ft + ", executed thread(" + Thread.currentThread().getName() + ")");
 	}
 
 }

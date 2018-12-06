@@ -1,6 +1,5 @@
 package org.bool.rhine.strategy;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.junit.Test;
 
 /**
@@ -11,14 +10,14 @@ import org.junit.Test;
  * Copyright @ 2018
  * 
  */
-public class RhineTaskManagerTest {
+public class RhineStrategyManagerTest {
 	@Test
 	public void registJobTest() {
 		RhineStrategy rs = new RhineStrategy();
 		rs.setCreateTime("");
 		rs.setTaskName("rhineTestJob");
-		rs.setCrontab("0/5 * * * * ?");
-		rs.setStrategyName("rhineTestJobStrategy");
+		rs.setCrontab("0/3 * * * * ?");
+		rs.setStrategyName("rhineTestJobStrategy_01");
 		RhineStrategyManager.registStrategy(rs);
 	}
 }

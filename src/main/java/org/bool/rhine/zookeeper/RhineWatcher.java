@@ -17,23 +17,27 @@ import org.bool.rhine.RhineScheduleManager;
 public class RhineWatcher implements Watcher {
 
 	public void process(WatchedEvent event) {
-		
+		//方便测试
+		System.out.println(event.getPath());
+		System.out.println(event.getType());
+		//
 		if (event.getState() == KeeperState.SyncConnected) {
 			//连接成功
 		} else if (event.getState() == KeeperState.Expired) {
-			ZKUtility.connectForever();
+			ZKTools.connectForever();
 			RhineScheduleManager.loadStrategyAndTask();
 		} else if (event.getState() == KeeperState.Disconnected) {
-			ZKUtility.connectForever();
+			ZKTools.connectForever();
 			RhineScheduleManager.loadStrategyAndTask();
 		} else if (event.getState() == KeeperState.AuthFailed) {
 			//连接认证失败，重新连接无意义
 		}
-		if (event.getType() == EventType.NodeChildrenChanged) {
+		if (event.getType() == EventType.NodeChildrenChanged || event.getType() == EventType.NodeDataChanged 
+				|| event.getType() == EventType.NodeCreated || event.getType() == EventType.NodeDeleted) {
 			RhineScheduleManager.loadStrategyAndTask();
 			try {				
-				if (ZKManager.getZooKeeper().exists(event.getPath(), false) != null) {
-					ZKManager.getZooKeeper().getChildren(event.getPath(), true);
+				if (ZKTools.getZooKeeper().exists(event.getPath(), false) != null) {
+					ZKTools.getZooKeeper().getChildren(event.getPath(), true);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -1,8 +1,7 @@
 package org.bool.rhine.task;
 
 import org.apache.zookeeper.CreateMode;
-import org.bool.rhine.zookeeper.ZKManager;
-import org.bool.rhine.zookeeper.ZKUtility;
+import org.bool.rhine.zookeeper.ZKTools;
 
 import net.sf.json.JSONObject;
 
@@ -24,11 +23,11 @@ public class RhineTaskManager {
 		jo.put("class_name", job.getClassName());
 		try {
 			//检查并连接
-			while (!ZKManager.checkState()) {
-				ZKManager.connect();
+			while (!ZKTools.checkState()) {
+				ZKTools.connect();
 			}
 			//创建带数据的节点
-			ZKUtility.create(ZKManager.getZKConfig().getPath() + "/task/" + job.getName(), jo.toString().getBytes(), CreateMode.PERSISTENT);
+			ZKTools.create(ZKTools.getZKConfig().getPath() + "/task/" + job.getName(), jo.toString().getBytes(), CreateMode.PERSISTENT);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

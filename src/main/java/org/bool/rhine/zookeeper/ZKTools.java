@@ -8,6 +8,9 @@ import java.util.ResourceBundle;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooDefs.Ids;
@@ -18,14 +21,14 @@ import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 
 /**
- * ZK管理器，初始化配置等
+ * ZK工具
  *
  * Author: 不二   
  *
  * Copyright @ 2018
  * 
  */
-public class ZKManager {
+public class ZKTools {
 	
 	/**
 	 * ZK的配置
@@ -145,5 +148,74 @@ public class ZKManager {
 			reConnect();
 		}
 		return zookeeper;
+	}
+	
+	/**
+	 *  递归创建目录
+	 * @throws Exception 
+	 */
+	public static void createPath(String path, CreateMode mode, List<ACL> acl, boolean watcher) throws KeeperException, Exception {
+		//非空判断
+		if(StringUtils.isBlank(path)) {
+			return;
+		}
+		//盘符转换
+		path = path.replace("\\", "/");
+		//逐层创建目录
+		String[] paths = path.split("/");
+		String absPath = "";
+		for (String pth : paths) {
+			if (StringUtils.isNotBlank(pth)) {
+				absPath = absPath + "/" + pth;
+				if (ZKTools.getZooKeeper().exists(absPath, watcher) == null) {
+					ZKTools.getZooKeeper().create(absPath, null, acl, mode);
+				}
+			}
+		}
+	}
+	
+	public static List<String> getChildren(String path, boolean watcher) throws KeeperException, Exception {
+		return ZKTools.getZooKeeper().getChildren(path, watcher);
+	}
+
+	
+	public static byte[] getData(String path, boolean watcher) throws KeeperException, InterruptedException {
+		return ZKTools.getZooKeeper().getData(path, watcher, null);
+	}
+	
+	/**
+	 * 创建带数据的节点
+	 * @param path
+	 * @param data
+	 * @param mode
+	 * @throws Exception
+	 */
+	public static void create(String path, byte[] data, CreateMode mode) throws Exception {
+		if (ZKTools.getZooKeeper().exists(path, false) == null) {			
+			ZKTools.getZooKeeper().create(path, data, ZKTools.getAcl(), mode);
+		}
+	}
+	/**
+	 * 可创建节点&更新数据
+	 * @param path
+	 * @param data
+	 * @param mode
+	 * @throws Exception
+	 */
+	public static void createUpdateData(String path, byte[] data, CreateMode mode) throws Exception {
+		if (ZKTools.getZooKeeper().exists(path, false) == null) {			
+			ZKTools.getZooKeeper().create(path, null, ZKTools.getAcl(), mode);
+		}
+		ZKTools.getZooKeeper().setData(path, data, -1);
+	}
+
+	public static void connectForever() {
+		while (!ZKTools.checkState()) {
+			ZKTools.connect();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
+		}
+		
 	}
 }

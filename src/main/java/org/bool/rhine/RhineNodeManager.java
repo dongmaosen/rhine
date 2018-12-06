@@ -5,8 +5,7 @@ import java.util.UUID;
 
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.bool.rhine.zookeeper.ZKManager;
-import org.bool.rhine.zookeeper.ZKUtility;
+import org.bool.rhine.zookeeper.ZKTools;
 
 /**
  * 当前运行节点管理
@@ -37,7 +36,7 @@ public class RhineNodeManager {
 		if (nodeName == null) {			
 			nodeName = InetAddress.getLocalHost().getHostAddress() + "#" + UUID.randomUUID().toString().replaceAll("-", "") + "#";
 		}
-		ZKUtility.createPath(ZKManager.getZKConfig().getPath() + "/node/" + nodeName, CreateMode.EPHEMERAL_SEQUENTIAL, ZKManager.getAcl(), false);
+		ZKTools.createPath(ZKTools.getZKConfig().getPath() + "/node/" + nodeName, CreateMode.EPHEMERAL_SEQUENTIAL, ZKTools.getAcl(), false);
 	}
 	
 	

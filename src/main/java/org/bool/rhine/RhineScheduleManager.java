@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.lang.StringUtils;
 import org.bool.rhine.task.RhineQuartzJob;
-import org.bool.rhine.zookeeper.ZKManager;
-import org.bool.rhine.zookeeper.ZKUtility;
+import org.bool.rhine.zookeeper.ZKTools;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
@@ -40,9 +40,7 @@ public class RhineScheduleManager {
 	private static final String JOB_GROUP_NAME = "RHINE_JOB_GROUP";
 	
 	private static final String TRIGGER_GROUP_NAME = "RHINE_TRIGGER_GROUP";
-	
-	private static final String TRIGGER_NAME = "RHINE_TRIGGER_NAME";
-	
+		
 	private static Scheduler getScheduler() {
 		try {
 			return scheduler == null ? (scheduler = new StdSchedulerFactory().getScheduler()) : scheduler;
@@ -54,7 +52,6 @@ public class RhineScheduleManager {
 	private static TriggerBuilder<Trigger> getTriggerBuilder() {
 		if (triggerBuilder == null) {
 			triggerBuilder = TriggerBuilder.newTrigger();
-			triggerBuilder.withIdentity(TRIGGER_NAME, TRIGGER_GROUP_NAME);
 		}
 		return triggerBuilder;
 	}
@@ -66,23 +63,23 @@ public class RhineScheduleManager {
 		//0.清除已有的任务
 		clearAllTasks();
 		//1.连ZK
-		ZKUtility.connectForever();
+		ZKTools.connectForever();
 		try {
 			lock.lock();
 			//2.加载任务&策略&节点，并按策略执行任务
 			//2.0加载节点信息
-			List<String> nodes = ZKUtility.getChildren(ZKManager.getZKConfig().getPath() + "/node", true);
+			List<String> nodes = ZKTools.getChildren(ZKTools.getZKConfig().getPath() + "/node", true);
 			if (!isLeader(nodes)) {
 				return;
 			}
 			//2.1加载任务
 			HashMap<String, String> jobMap = new HashMap<String, String>();
-			String taskPath = ZKManager.getZKConfig().getPath() + "/task";
-			List<String> paths = ZKUtility.getChildren(taskPath, true);
+			String taskPath = ZKTools.getZKConfig().getPath() + "/task";
+			List<String> paths = ZKTools.getChildren(taskPath, true);
 			if (paths != null && paths.size() > 0) {
 				for (String path : paths) {
 					//{"job_name":"rhineTestJob","class_name":"org.bool.rhine.task.RhineQuartzDemoJob"}
-					byte[] data = ZKUtility.getData(taskPath + "/" + path, true);
+					byte[] data = ZKTools.getData(taskPath + "/" + path, true);
 					JSONObject jo = JSONObject.fromObject(new String(data));
 					String jobName = jo.getString("job_name");
 					String className = jo.getString("class_name");
@@ -90,26 +87,27 @@ public class RhineScheduleManager {
 				}
 			}
 			//2.2加载策略
-			HashMap<String, String> strategyMap = new HashMap<String, String>();
-			String strategyPath = ZKManager.getZKConfig().getPath() + "/strategy";
-			List<String> strategys = ZKUtility.getChildren(strategyPath, true);
+			HashMap<String, JSONObject> strategyMap = new HashMap<String, JSONObject>();
+			String strategyPath = ZKTools.getZKConfig().getPath() + "/strategy";
+			List<String> strategys = ZKTools.getChildren(strategyPath, true);
 			if (strategys != null && strategys.size() > 0) {
 				for (String strategy : strategys) {
 					//{"createTime":"","crontab":"0/5 * * * * ?","strategyName":"rhineTestJobStrategy","taskName":"rhineTestJob"}
-					byte[] data = ZKUtility.getData(strategyPath + "/" + strategy, true);
+					byte[] data = ZKTools.getData(strategyPath + "/" + strategy, true);
 					JSONObject jo = JSONObject.fromObject(new String(data));
-					String jobName = jo.getString("taskName");
-					String crontab = jo.getString("crontab");
-					strategyMap.put(jobName, crontab);
+					String strategyName = jo.getString("strategyName");
+					strategyMap.put(strategyName, jo);
 				}
 			}
 			//3.重新初始化本地任务
 			Iterator<String> keys = strategyMap.keySet().iterator();
 			while (keys.hasNext()) {
 				String key = keys.next();
-				String crontab = strategyMap.get(key);
-				String className = jobMap.get(key);
-				addTask(className, crontab, key);
+				JSONObject jo = strategyMap.get(key);
+				String taskName = jo.getString("taskName");
+				if (StringUtils.isNotBlank(taskName)) {					
+					addTask(jobMap.get(taskName), jo.getString("crontab"), key + "-" + jo.getString("taskName"));
+				}
 			}
 			if (!getScheduler().isShutdown()) {				
 				getScheduler().start();
@@ -163,6 +161,7 @@ public class RhineScheduleManager {
 		@SuppressWarnings("unchecked")
 		Class<RhineQuartzJob> jobClass = (Class<RhineQuartzJob>) Class.forName(className);
 		JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, JOB_GROUP_NAME).build();
+		getTriggerBuilder().withIdentity(jobName + "-trigger", TRIGGER_GROUP_NAME);
 		getTriggerBuilder().startNow();
 		getTriggerBuilder().withSchedule(CronScheduleBuilder.cronSchedule(crontab));
 		CronTrigger trigger = (CronTrigger) getTriggerBuilder().build();

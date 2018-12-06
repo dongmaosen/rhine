@@ -1,8 +1,7 @@
 package org.bool.rhine.strategy;
 
 import org.apache.zookeeper.CreateMode;
-import org.bool.rhine.zookeeper.ZKManager;
-import org.bool.rhine.zookeeper.ZKUtility;
+import org.bool.rhine.zookeeper.ZKTools;
 
 import net.sf.json.JSONObject;
 
@@ -23,11 +22,11 @@ public class RhineStrategyManager {
 		JSONObject jo = JSONObject.fromObject(strategy);
 		try {
 			//检查并连接
-			while(!ZKManager.checkState()) {
-				ZKManager.connect();
+			while(!ZKTools.checkState()) {
+				ZKTools.connect();
 			}
-			//创建带数据的节点
-			ZKUtility.create(ZKManager.getZKConfig().getPath() + "/strategy/" + strategy.getStrategyName(), jo.toString().getBytes(), CreateMode.PERSISTENT);
+			//创建并更新策略
+			ZKTools.createUpdateData(ZKTools.getZKConfig().getPath() + "/strategy/" + strategy.getStrategyName(), jo.toString().getBytes(), CreateMode.PERSISTENT);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
