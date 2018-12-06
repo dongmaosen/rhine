@@ -1,5 +1,6 @@
 package org.bool.rhine.task;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.zookeeper.CreateMode;
 import org.bool.rhine.zookeeper.ZKTools;
 
@@ -30,6 +31,16 @@ public class RhineTaskManager {
 			ZKTools.create(ZKTools.getZKConfig().getPath() + "/task/" + job.getName(), jo.toString().getBytes(), CreateMode.PERSISTENT);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 删除job
+	 * @throws Exception 
+	 */
+	public static void unregistQuartzJob(String jobName) throws Exception {
+		if (StringUtils.isNotBlank(jobName)) {
+			ZKTools.delete(ZKTools.getZKConfig().getPath() + "/task/" + StringUtils.trim(jobName));
 		}
 	}
 }

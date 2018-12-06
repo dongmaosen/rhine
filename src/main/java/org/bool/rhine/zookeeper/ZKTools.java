@@ -167,20 +167,20 @@ public class ZKTools {
 		for (String pth : paths) {
 			if (StringUtils.isNotBlank(pth)) {
 				absPath = absPath + "/" + pth;
-				if (ZKTools.getZooKeeper().exists(absPath, watcher) == null) {
-					ZKTools.getZooKeeper().create(absPath, null, acl, mode);
+				if (getZooKeeper().exists(absPath, watcher) == null) {
+					getZooKeeper().create(absPath, null, acl, mode);
 				}
 			}
 		}
 	}
 	
 	public static List<String> getChildren(String path, boolean watcher) throws KeeperException, Exception {
-		return ZKTools.getZooKeeper().getChildren(path, watcher);
+		return getZooKeeper().getChildren(path, watcher);
 	}
 
 	
 	public static byte[] getData(String path, boolean watcher) throws KeeperException, InterruptedException {
-		return ZKTools.getZooKeeper().getData(path, watcher, null);
+		return getZooKeeper().getData(path, watcher, null);
 	}
 	
 	/**
@@ -191,9 +191,17 @@ public class ZKTools {
 	 * @throws Exception
 	 */
 	public static void create(String path, byte[] data, CreateMode mode) throws Exception {
-		if (ZKTools.getZooKeeper().exists(path, false) == null) {			
-			ZKTools.getZooKeeper().create(path, data, ZKTools.getAcl(), mode);
+		if (getZooKeeper().exists(path, false) == null) {			
+			getZooKeeper().create(path, data, ZKTools.getAcl(), mode);
 		}
+	}
+	/**
+	 * 强行删除节点（供删除任务和策略使用）
+	 * @param path
+	 * @throws Exception
+	 */
+	public static void delete(String path) throws Exception {
+		getZooKeeper().delete(path, -1);
 	}
 	/**
 	 * 可创建节点&更新数据
@@ -203,15 +211,15 @@ public class ZKTools {
 	 * @throws Exception
 	 */
 	public static void createUpdateData(String path, byte[] data, CreateMode mode) throws Exception {
-		if (ZKTools.getZooKeeper().exists(path, false) == null) {			
-			ZKTools.getZooKeeper().create(path, null, ZKTools.getAcl(), mode);
+		if (getZooKeeper().exists(path, false) == null) {			
+			getZooKeeper().create(path, null, ZKTools.getAcl(), mode);
 		}
-		ZKTools.getZooKeeper().setData(path, data, -1);
+		getZooKeeper().setData(path, data, -1);
 	}
 
 	public static void connectForever() {
-		while (!ZKTools.checkState()) {
-			ZKTools.connect();
+		while (!checkState()) {
+			connect();
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {}
