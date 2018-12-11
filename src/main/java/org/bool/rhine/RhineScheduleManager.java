@@ -3,8 +3,6 @@ package org.bool.rhine;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang.StringUtils;
 import org.bool.rhine.task.RhineQuartzJob;
@@ -35,7 +33,7 @@ public class RhineScheduleManager {
 	
 	private static TriggerBuilder<Trigger> triggerBuilder = null;
 	
-	private static Lock lock = new ReentrantLock();
+	public static Object lock = new Object();
 	
 	private static final String JOB_GROUP_NAME = "RHINE_JOB_GROUP";
 	
@@ -62,10 +60,9 @@ public class RhineScheduleManager {
 	public static void loadStrategyAndTask() {
 		//0.清除已有的任务
 		clearAllTasks();
-		//1.连ZK
-		ZKTools.connectForever();
 		try {
-			lock.lock();
+			//1.检查状态
+			ZKTools.connectForever();
 			//2.加载任务&策略&节点，并按策略执行任务
 			//2.0加载节点信息
 			List<String> nodes = ZKTools.getChildren(ZKTools.getZKConfig().getPath() + "/node", true);
@@ -115,7 +112,7 @@ public class RhineScheduleManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			lock.unlock();
+			runState = true;
 		}
 	}
 	/**
@@ -177,4 +174,18 @@ public class RhineScheduleManager {
 			getScheduler().clear();
 		} catch (SchedulerException e) {}
 	}
+	/**
+	 * 调度器是否正常运行
+	 */
+	private static boolean runState = false;
+	
+	public static boolean getRunState() {
+		synchronized (lock) {
+			return runState;			
+		}
+	}
+	
+	public static void setRunState(boolean state) {
+		runState = state;
+	} 
 }
