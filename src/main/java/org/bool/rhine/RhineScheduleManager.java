@@ -41,7 +41,11 @@ public class RhineScheduleManager {
 		
 	private static Scheduler getScheduler() {
 		try {
-			return scheduler == null ? (scheduler = new StdSchedulerFactory().getScheduler()) : scheduler;
+			if (scheduler == null) {
+				scheduler = new StdSchedulerFactory().getScheduler();
+				scheduler.getListenerManager().addJobListener(new RhineJobListener());
+			}
+			return scheduler;
 		} catch (SchedulerException e) {
 			return scheduler;
 		}

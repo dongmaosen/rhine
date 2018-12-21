@@ -1,5 +1,9 @@
 package org.bool.rhine;
 
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.bool.rhine.zookeeper.ZKConfig;
+import org.bool.rhine.zookeeper.ZKTools;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
@@ -21,6 +25,14 @@ public class RhineJobListener implements JobListener {
 	}
 
 	public void jobToBeExecuted(JobExecutionContext context) {
+		String jobName = context.getJobDetail().getKey().getName();
+		try {
+			ZKTools.createPath(ZKTools.getZKConfig().getPath() + "/statistics/" + jobName, CreateMode.PERSISTENT, ZKTools.getAcl(), false);
+		} catch (KeeperException e) {
+			
+		} catch (Exception e) {
+
+		}
 		System.out.println("jobToBeExecuted - " + context.getJobDetail().getKey().getName());
 	}
 
@@ -30,6 +42,7 @@ public class RhineJobListener implements JobListener {
 
 	public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
 		System.out.println("jobWasExecuted - " + context.getJobDetail().getJobClass().getName());
+		//
 	}
 
 }
