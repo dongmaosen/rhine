@@ -226,4 +226,14 @@ public class ZKTools {
 		}
 		
 	}
+	/**
+	 * 检查路径是否存在
+	 * @param path
+	 * @return
+	 * @throws InterruptedException 
+	 * @throws KeeperException 
+	 */
+	public static boolean exist(String path) throws KeeperException, InterruptedException {
+		return getZooKeeper().exists(path, false) != null;
+	}
 }
