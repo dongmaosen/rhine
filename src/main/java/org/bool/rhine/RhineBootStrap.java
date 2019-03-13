@@ -1,5 +1,8 @@
 package org.bool.rhine;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -10,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Copyright @ 2018
  * 
  */
-public class RhineStarter {
+public class RhineBootStrap {
 	/**
 	 * lock for initialization
 	 */
@@ -18,22 +21,22 @@ public class RhineStarter {
 	/**
 	 * 客户端初始化线程
 	 */
-	private static RhineInitThread rhineInitThread;
+	private static RhineInitTask rhineInitThread;
 	/**
 	 * rhine初始化操作：客户端与ZK集群交互的开始，单独的线程
+	 * @return 
 	 */
-	public static void init() {
-
+	public static Future<String> start() {
 		//锁定防止多线程同时初始化
 		lock.lock();
 		try {
 			if (rhineInitThread == null) {				
-				rhineInitThread = new RhineInitThread();
-				rhineInitThread.setName("rhineInitThread-" + rhineInitThread.getId());
-				rhineInitThread.start();
+				ExecutorService es = Executors.newSingleThreadExecutor();
+				return es.submit(new RhineInitTask());
 			}
 		} finally {
 			lock.unlock();
 		}
+		return null;
 	}
 }

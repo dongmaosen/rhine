@@ -33,7 +33,26 @@ public class RhineTaskManager {
 			e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * 字符串形式注册类
+	 * @param jobName
+	 * @param jobFullClassName
+	 */
+	public static void registQuartzJob(String jobName, String jobFullClassName) {
+		JSONObject jo = new JSONObject();
+		jo.put("job_name", jobName);
+		jo.put("class_name", jobFullClassName);
+		try {
+			//检查并连接
+			while (!ZKTools.checkState()) {
+				ZKTools.connect();
+			}
+			//创建带数据的节点
+			ZKTools.create(ZKTools.getZKConfig().getPath() + "/task/" + jobName, jo.toString().getBytes(), CreateMode.PERSISTENT);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	} 
 	/**
 	 * 删除job
 	 * @throws Exception 

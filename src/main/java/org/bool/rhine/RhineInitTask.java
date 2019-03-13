@@ -1,25 +1,22 @@
 package org.bool.rhine;
 
+import java.util.concurrent.Callable;
+
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.bool.rhine.zookeeper.ZKTools;
 
 /**
- * 
+ * Init rhine
  *
  * Author: 不二   
  *
  * Copyright @ 2018
  * 
  */
-public class RhineInitThread extends Thread{
+public class RhineInitTask implements Callable<String>{
 	
-	public RhineInitThread() {
-	
-	}
-	
-	@Override
-	public void run() {
+	public String call() {
 		try {
 			synchronized (RhineScheduleManager.lock) {				
 				//0.连接ZK
@@ -43,6 +40,7 @@ public class RhineInitThread extends Thread{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return RhineConstants.INIT_SUCCESS;
 	}
 
 }
