@@ -137,7 +137,7 @@ public class RhineScheduleManager {
 			}
 		}
 		for (String path : nodes) {
-			if (local > getSequence(path)) {
+			if (local < getSequence(path)) {
 				return false;
 			}
 		}

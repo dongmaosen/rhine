@@ -1,9 +1,13 @@
 package org.bool.rhine.zookeeper;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -54,18 +58,50 @@ public class ZKTools {
 	 *  一些安全策略
 	 */
 	private static List<ACL> acl = new ArrayList<ACL>();
+	
+	/**
+	 * rhineConfigFilePath
+	 */
+	private static String rhinePropertiesPath = null;
+	
+	public static String getRhinePropertiesPath() {
+		return rhinePropertiesPath;
+	}
+
+	public static void setRhinePropertiesPath(String rhinePropertiesPath) {
+		ZKTools.rhinePropertiesPath = rhinePropertiesPath;
+	}
+
 	/**
 	 * initialize zkConfig
 	 */
 	private static void initConfig() {
 		if (zkConfig == null) {
 			zkConfig = new ZKConfig();
-			ResourceBundle rb = ResourceBundle.getBundle("rhine");
-			zkConfig.setConnectString(rb.getString("connectString"));
-			zkConfig.setPath(rb.getString("prefix"));
-			zkConfig.setSessionTimeout(Integer.parseInt(rb.getString("sessionTimeout")));
-			zkConfig.setUserName(rb.getString("userName"));
-			zkConfig.setPassword(rb.getString("password"));
+			if (getRhinePropertiesPath() == null) {
+				ResourceBundle rb = ResourceBundle.getBundle("rhine");
+				zkConfig.setConnectString(rb.getString("connectString"));
+				zkConfig.setPath(rb.getString("prefix"));
+				zkConfig.setSessionTimeout(Integer.parseInt(rb.getString("sessionTimeout")));
+				zkConfig.setUserName(rb.getString("userName"));
+				zkConfig.setPassword(rb.getString("password"));
+			} else {
+				Properties properties = new Properties();
+				BufferedReader bufferedReader;
+				try {
+					bufferedReader = new BufferedReader(new FileReader(getRhinePropertiesPath()));
+					properties.load(bufferedReader);
+					zkConfig.setConnectString(properties.getProperty("connectString"));
+					zkConfig.setPath(properties.getProperty("prefix"));
+					zkConfig.setSessionTimeout(Integer.parseInt(properties.getProperty("sessionTimeout")));
+					zkConfig.setUserName(properties.getProperty("userName"));
+					zkConfig.setPassword(properties.getProperty("password"));
+				} catch (FileNotFoundException e) {
+					
+				} catch (IOException e) {
+					
+				}
+			}
 		}
 	}
 	
