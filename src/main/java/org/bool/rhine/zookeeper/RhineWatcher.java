@@ -4,6 +4,7 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
+import org.bool.rhine.RhineNodeManager;
 import org.bool.rhine.RhineScheduleManager;
 
 /**
@@ -22,6 +23,12 @@ public class RhineWatcher implements Watcher {
 			//连接成功
 			//断开后重连情况下
 			if (!RhineScheduleManager.getRunState()) {
+				//修复节点失效后无节点问题
+				try {
+					RhineNodeManager.registNode();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				RhineScheduleManager.loadStrategyAndTask();
 			}
 		} else if (event.getState() == KeeperState.Expired) {

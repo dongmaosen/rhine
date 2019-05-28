@@ -16,7 +16,7 @@ public class RhineStrategyManagerTest {
 		RhineStrategy rs = new RhineStrategy();
 		rs.setCreateTime("");
 		rs.setTaskName("rhineTestJob");
-		rs.setCrontab("0 0 */1 * * ? *");
+		rs.setCrontab("*/5 * * * * ? *");
 		rs.setStrategyName("rhineTestJobStrategy_01");
 		RhineStrategyManager.registStrategy(rs);
 	}
