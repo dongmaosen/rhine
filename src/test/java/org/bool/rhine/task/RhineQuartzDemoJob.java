@@ -18,7 +18,7 @@ public class RhineQuartzDemoJob extends RhineQuartzJob {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		String ft = DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss");
-		System.out.println("RhineQuartzDemoJob : " + ft + ", executed thread(" + Thread.currentThread().getName() + ")");
+		System.out.println("RhineQuartzDemoJob : " + ft + ", executed thread(" + Thread.currentThread().getName() + ")" + "-" + context.getJobDetail());
 	}
 
 }

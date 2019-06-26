@@ -70,8 +70,18 @@ public class RhineScheduleManager {
 			//2.加载任务&策略&节点，并按策略执行任务
 			//2.0加载节点信息
 			List<String> nodes = ZKTools.getChildren(ZKTools.getZKConfig().getPath() + "/node", true);
-			if (!isLeader(nodes)) {
-				return;
+//          单节点运行
+//			if (!isLeader(nodes)) {
+//				return;
+//			}
+			//多节点分别运行任务
+			int nodeCount = nodes.size();
+			int nodeSequence = 0;
+			for (int i = 0; i < nodes.size(); i++) {
+				if (nodes.get(i).startsWith(RhineNodeManager.getNodeName())) {
+					nodeSequence = i;
+					break;
+				}
 			}
 			//2.1加载任务
 			HashMap<String, String> jobMap = new HashMap<String, String>();
@@ -92,12 +102,15 @@ public class RhineScheduleManager {
 			String strategyPath = ZKTools.getZKConfig().getPath() + "/strategy";
 			List<String> strategys = ZKTools.getChildren(strategyPath, true);
 			if (strategys != null && strategys.size() > 0) {
-				for (String strategy : strategys) {
-					//{"createTime":"","crontab":"0/5 * * * * ?","strategyName":"rhineTestJobStrategy","taskName":"rhineTestJob"}
-					byte[] data = ZKTools.getData(strategyPath + "/" + strategy, true);
-					JSONObject jo = JSONObject.fromObject(new String(data));
-					String strategyName = jo.getString("strategyName");
-					strategyMap.put(strategyName, jo);
+				for (int i = 0; i < strategys.size(); i++) {
+					//按节点顺序，取模达到负载均衡的目的
+					if (i % nodeCount == nodeSequence) {						
+						//{"createTime":"","crontab":"0/5 * * * * ?","strategyName":"rhineTestJobStrategy","taskName":"rhineTestJob"}
+						byte[] data = ZKTools.getData(strategyPath + "/" + strategys.get(i), true);
+						JSONObject jo = JSONObject.fromObject(new String(data));
+						String strategyName = jo.getString("strategyName");
+						strategyMap.put(strategyName, jo);
+					}
 				}
 			}
 			//3.重新初始化本地任务
